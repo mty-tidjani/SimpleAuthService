@@ -1,5 +1,7 @@
 import cors from 'cors';
+
 import { AppRoutes } from './routes/app.routes';
+import { dbConnection } from './core/db/connect';
 
 export class AuthAPI {
   config: any;
@@ -11,8 +13,10 @@ export class AuthAPI {
     this.app = app;
   }
 
-  initialise = () => {
+  initialise = async () => {
     const { port } = this.config;
+
+    await dbConnection();
 
     this.app.use(cors());
 

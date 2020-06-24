@@ -1,6 +1,9 @@
-/node_modules
-/logs
+.idea/
+.vscode/
+node_modules/
+build/
+tmp/
+temp/
+logs/
 .env
 .env.prod
-/dist
-/build
