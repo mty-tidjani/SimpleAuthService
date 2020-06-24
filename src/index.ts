@@ -1,5 +1,5 @@
 import cors from 'cors';
-// import { AppRoutes } from './router/_index';
+import { AppRoutes } from './routes/app.routes';
 
 export class AuthAPI {
   config: any;
@@ -16,7 +16,7 @@ export class AuthAPI {
 
     this.app.use(cors());
 
-    // this.app.use('/', new AppRoutes(this.config).initRoutes());
+    this.app.use('/', new AppRoutes(this.config).init());
 
     this.app.listen(port, () => {
       console.log(`The Auth Service is running on port ${port}.`);

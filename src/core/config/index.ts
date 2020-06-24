@@ -3,10 +3,14 @@ require('dotenv').config();
 const { env } = process;
 
 const config: Config = {
-  port: env.APP_PORT
+  env,
+  port: env.APP_PORT,
+  routesPrefix: env.ROUTES_PREFIX
 }
 
-type Config = {
-  port: any
+export type Config = {
+  env: NodeJS.ProcessEnv
+  port: any,
+  routesPrefix: any
 }
 export default config;
