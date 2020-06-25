@@ -6,7 +6,7 @@ export const  strRandom = (length: number = 12) : string  => {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
-}
+};
 
 export const  numRandom = (length: number = 5) : string  => {
   let result = '';
@@ -16,4 +16,4 @@ export const  numRandom = (length: number = 5) : string  => {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
-}
+};
