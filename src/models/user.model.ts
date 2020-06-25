@@ -14,13 +14,16 @@ export class User extends ModelEntity {
   @Column({ name: 'public_name', nullable: false })
   publicName: string;
 
+  @Column({ name: 'email', default: null })
+  email: string;
+
   @Column({ name: 'api_token', nullable: false })
   apiToken: string;
 
-  // @Column({ name: '', default: null })
-  // sensitivity: string;
+  @Column({ name: 'verified', default: false })
+  verified: boolean;
 
   @Column({ nullable: true })
-  phoneNumber: string;
+  phone: string;
 
 }

@@ -15,9 +15,8 @@ export class ModelEntity {
   @IsDate()
   updatedAt: Date;
 
-  @UpdateDateColumn({ name: 'deleted_at', default: null })
-  @IsDate()
-  deleteddAt: Date;
+  @UpdateDateColumn({ name: 'deleted_at', nullable: true })
+  deletedAt: Date | null;
 
   public static async validate(entity: ModelEntity): Promise<any> {
     return await validate(entity, {
@@ -32,5 +31,6 @@ export class ModelEntity {
   public setDate(): void {
     this.createdAt = new Date();
     this.updatedAt = new Date();
+    this.deletedAt = null;
   }
 }

@@ -7,6 +7,8 @@ const config: Config = {
   port: env.APP_PORT,
   routesPrefix: env.ROUTES_PREFIX,
   logDir: env.LOG_DIR,
+  jwtoken: env.JWT_TOKEN,
+  jwtExpire: env.JWT_EXPIRE
 };
 
 export type Config = {
@@ -14,6 +16,8 @@ export type Config = {
   port: any,
   routesPrefix: any,
   logDir: any,
+  jwtoken: any,
+  jwtExpire: any
 };
 
 export default config;

@@ -12,7 +12,7 @@ export class Auth extends ModelEntity {
   password: string;
 
   @Column({ name: 'email', nullable: false })
-  companyName: string;
+  email: string;
 
   @Column({ name: 'old_password', default: null })
   oldPassword: string;
@@ -25,5 +25,8 @@ export class Auth extends ModelEntity {
 
   @Column({ name: 'activation_token', nullable: false })
   activationToken: string;
+
+  @Column({ name: 'activation_code', nullable: false })
+  activationCode: string;
 
 }

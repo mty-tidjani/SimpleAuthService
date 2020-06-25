@@ -10,6 +10,8 @@
       "dev": "ts-node-dev --respawn --transpileOnly ./src/app.ts"
    },
    "dependencies": {
+      "bcryptjs": "^2.4.3",
+      "body-parser": "^1.19.0",
       "braces": ">=2.3.1",
       "class-validator": "^0.12.2",
       "cors": "^2.8.5",
@@ -17,13 +19,14 @@
       "express": "^4.17.1",
       "jsonwebtoken": "^8.5.1",
       "lodash": "^4.17.15",
+      "mysql": "^2.14.1",
+      "reflect-metadata": "^0.1.10",
       "typeorm": "0.2.25",
       "winston": "^3.2.1",
-      "winston-daily-rotate-file": "^4.4.2",
-      "reflect-metadata": "^0.1.10",
-      "mysql": "^2.14.1"
+      "winston-daily-rotate-file": "^4.4.2"
    },
    "devDependencies": {
+      "@types/bcryptjs": "^2.4.2",
       "@types/cors": "^2.8.6",
       "@types/jsonwebtoken": "^8.5.0",
       "@types/lodash": "^4.14.157",

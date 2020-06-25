@@ -1,6 +1,6 @@
 import express, { Response, NextFunction, Request, Router } from 'express';
 import { BaseRouter } from './_base';
-import { MainCtrl } from '../controllers/main,controller';
+import { AuthController } from '../controllers/auth.controller';
 
 
 export class AppRoutes extends BaseRouter {
@@ -8,17 +8,17 @@ export class AppRoutes extends BaseRouter {
   init(): Router {
     const prefix = this.config.routesPrefix;
 
-    this.router.post(`${prefix}/login`, MainCtrl.login);
+    this.router.post(`${prefix}/login`, AuthController.login);
 
-    this.router.post(`${prefix}/register`, MainCtrl.login);
+    this.router.post(`${prefix}/register`, AuthController.create);
 
-    this.router.post(`${prefix}/reset/password`, MainCtrl.login);
+    this.router.post(`${prefix}/reset/password`, AuthController.login);
 
-    this.router.post(`${prefix}/refresh/token`, MainCtrl.login);
+    this.router.post(`${prefix}/refresh/token`, AuthController.login);
 
-    this.router.post(`${prefix}/confirm/account`, MainCtrl.login);
+    this.router.post(`${prefix}/confirm/account`, AuthController.login);
 
-    this.router.post(`${prefix}/forgot/password`, MainCtrl.login);
+    this.router.post(`${prefix}/forgot/password`, AuthController.login);
 
     this.router.get('/**', (req: Request, res: Response<any>, next: NextFunction) => {
       res.send('<h1 style="text-align: center;padding-top: 10%"> Usefulreturn Auth API <br /> Version: 1.0.0 </h1>');
