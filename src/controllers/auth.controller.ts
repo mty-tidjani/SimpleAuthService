@@ -62,7 +62,7 @@ class AuthController {
       const ot = await AuthController.authRepository().save(auth);
 
       const token = jwt.sign(
-        { ...us }, config.jwtoken,
+        { ...us }, config.jwtSecret,
         { expiresIn: config.jwtExpire },
       );
 
@@ -82,11 +82,11 @@ class AuthController {
     }
     // Get user from database
     let user: User = new User();
-    let auth: any = new Auth();
+    let auth: Auth = new Auth();
 
     try {
-      user = await AuthController.userRepository().findOneOrFail({ where: { email } });
-      auth = await AuthController.authRepository().findOneOrFail({ where: { email } });
+      auth = await AuthController.authRepository().findOneOrFail({ where: { email }, relations: ['user'] });
+      user = auth.user;
     } catch (error) {
       return res.status(401).send('Utilisateur inexistant');
     }
@@ -97,10 +97,10 @@ class AuthController {
       return res.status(401).send('Mot de passe invalide');
     }
 
-    console.log(config.jwtoken, config.jwtExpire);
+    console.log(config.jwtSecret, config.jwtExpire);
 
     const token = jwt.sign(
-      { ...user }, config.jwtoken,
+      { ...user }, config.jwtSecret,
       { expiresIn: config.jwtExpire },
     );
 
@@ -197,7 +197,7 @@ class AuthController {
 
          // AuthController.sendEmail(data);
           const token = jwt.sign(
-            { ...user }, config.jwtoken,
+            { ...user }, config.jwtSecret,
             { expiresIn: config.jwtExpire },
           );
 
@@ -249,7 +249,7 @@ class AuthController {
     let auth: Auth | undefined;
 
     try {
-      auth = await AuthController.authRepository().findOne({ where: { activationCode }, relations: [''] });
+      auth = await AuthController.authRepository().findOne({ where: { activationCode }, relations: ['user'] });
 
       if (!auth) return res.status(401).json({ msg: 'Incorect code' });
 
@@ -262,7 +262,7 @@ class AuthController {
        */
       const { user } = auth;
       const token = jwt.sign(
-        { ...user }, config.jwtoken,
+        { ...user }, config.jwtSecret,
         { expiresIn: config.jwtExpire },
       );
 
@@ -273,137 +273,37 @@ class AuthController {
     }
   }
 
-  // public static async forgottenPassword(req: Request, res: Response): Promise<any> {
-  //   // Get the ID from the url
-  //   const email: any = req.body.email;
-  //   const token: any = req.body.token;
-  //   const newPassword: any = req.body.newPassword;
+  public static async forgottenPassword(req: Request, res: Response): Promise<any> {
+    // Get the ID from the url
+    return AuthController.requestPasswordReset(req, res);
+  }
 
-  //   try {
-  //     const tVerif: any = await AuthController.tokenVerificationRepository().find({ where: { token } });
+  public static async refreshToken(req: Request, res: Response): Promise<any> {
+    const token = req.body.token;
+    if (!token) return res.status(400).json({ msg: 'Token not sent' });
 
-  //     if (tVerif === []) {
-  //       return res.status(403).send('Token invalide');
-  //     }
-  //     const tk: any = tVerif[0];
+    try {
+      const tokan : any = jwt.verify(token, config.jwtSecret, {
+        ignoreExpiration: true
+      });
 
-  //     console.log(tk);
-  //     if ((tk.isExpired) ||
-  //       ((new Date()).getTime() - tk.createdAt.getTime() > 1800000)) {
-  //       return res.status(403).send('Token expiré');
-  //     }
-  //     const userV: any = await AuthController.userRepository().findOneOrFail(tk.userId);
+      const user: User | undefined = await AuthController.userRepository().findOne(tokan.id);
 
-  //     if (email !== userV.email) {
-  //       return res.status(403).send('Verification failed');
-  //     }
-  //     try {
-  //       const userList: User[] = await AuthController.userRepository().find({ where: { email } });
+      if (!user) return res.status(400).json({ msg: 'Invalid token' });
 
-  //       if (userList === []) {
-  //         res.status(404).send('User not found');
-  //       }
-  //       let user: User = new User();
+      const tokn = jwt.sign(
+        { ...user }, config.jwtSecret,
+        { expiresIn: config.jwtExpire },
+      );
 
-  //       user = userList[0];
-  //       try {
-  //         // Validate de model (password lenght)
-  //         user.password = newPassword;
-  //         const errors: any = await validate(user);
+      res.status(201).send({ token: tokn });
+    } catch (err) {
+      return res.status(401).json({ err, msg: 'Not authorized' });
+    }
 
-  //         if (errors.length > 0) {
-  //           return res.status(400).send(errors);
-  //         }
-  //         // Hash the new password and save
-  //         user.hashPassword();
-  //         user.isVerified = true;
-  //         AuthController.userRepository().save(user);
-
-  //         tk.isExpired = true;
-  //         await AuthController.tokenVerificationRepository().save(tk);
-
-  //         const data = {
-  //           template: 'user-password-reset',
-  //           userFirstName: user.firstName,
-  //           link: '',
-  //           recipientEmail: user.email,
-  //           senderEmail: user.email
-  //         };
-  //         AuthController.sendEmail(data);
-  //         // emailNature: any, recipient: any, fname: any, link: any
-
-
-  //         return res.status(200).send('password reset successfull');
-  //       } catch (error) {
-  //         return res.status(403).send('Verification failed');
-  //       }
-  //     } catch (error) {
-  //       // If not found, send a 404 response
-  //       return res.status(404).send('User not found');
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-
-  //     return res.status(403).send(error);
-  //   }
-  // }
-
-  // public static async changePassword(req: Request, res: Response): Promise<any> {
-  //   // Get ID from JWT
-
-  //   // Get parameters from the body
-  //   // tslint:disable-next-line:typedef
-  //   const { userId, oldPassword, newPassword }: any = req.body;
-
-  //   if (!(oldPassword && newPassword)) {
-  //     res.status(400).send();
-  //   }
-
-  //   // Get user from the database
-  //   let user: User = new User();
-
-  //   try {
-  //     user = await AuthController.userRepository().findOneOrFail(userId);
-  //   } catch (id) {
-  //     res.status(401).send('utilisateur introuvable');
-  //   }
-
-  //   // Check if old password matchs
-  //   if (!bcrypt.compareSync(oldPassword, user.password)) {
-  //     return res.status(401).send();
-  //   }
-
-  //   // Validate de model (password lenght)
-  //   user.password = newPassword;
-  //   const errors: any = await validate(user);
-
-  //   if (errors.length > 0) {
-  //     return res.status(400).send(errors);
-  //   }
-  //   // Hash the new password and save
-  //   user.hashPassword();
-  //   AuthController.userRepository().save(user);
-
-  //   const newToken: any = jwt.sign({
-  //     userId: user.id,
-  //     email: user.email,
-  //     discriminator: user.discriminator,
-  //   },                             JWT_REFRESH_SECRET, {
-  //       expiresIn: JWT_REFRESH_EXPIRE,
-  //   });
-
-  //   const data = {
-  //     template: 'change-password',
-  //     userFirstName: user.firstName,
-  //     link: '',
-  //     recipientEmail: user.email,
-  //     senderEmail: user.email
-  //   };
-
-  //   AuthController.sendEmail(data);
-
-  //   res.status(200).send(newToken);
-  // }
+    // Get the ID from the url
+    return res.status(200).json({ msg: "Lolololololololo" });
+  }
 
   // static sendEmail(data: any) {
   //   axios.default({
@@ -418,6 +318,7 @@ class AuthController {
   //     console.log('email failed !!!');
   //   });
   // }
+
 }
 
 export { AuthController };

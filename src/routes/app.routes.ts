@@ -20,9 +20,9 @@ export class AppRoutes extends BaseRouter {
 
     this.router.post(`${prefix}/reset/password`, AuthController.resetPassword);
 
-    this.router.post(`${prefix}/refresh/token`, AuthController.login);
+    this.router.post(`${prefix}/forgot/password`, AuthController.forgottenPassword);
 
-    this.router.post(`${prefix}/forgot/password`, AuthController.login);
+    this.router.post(`${prefix}/refresh/token`, AuthController.refreshToken);
 
     this.router.get('/**', (req: Request, res: Response<any>, next: NextFunction) => {
       res.send('<h1 style="text-align: center;padding-top: 10%"> Usefulreturn Auth API <br /> Version: 1.0.0 </h1>');
