@@ -260,6 +260,13 @@ class AuthController {
       /**
        * Todo send mail here
        */
+      const { user } = auth;
+      const token = jwt.sign(
+        { ...user }, config.jwtoken,
+        { expiresIn: config.jwtExpire },
+      );
+
+      res.status(201).json({ user, token });
       return res.status(200).json({ msg: 'Reset code sent by email' });
     } catch (error) {
       res.status(401).send();

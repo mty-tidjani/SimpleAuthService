@@ -16,9 +16,9 @@ export class AppRoutes extends BaseRouter {
 
     this.router.post(`${prefix}/confirm/account`, AuthController.codeConfirmation);
 
-    this.router.post(`${prefix}/request/password/reset`, AuthController.login);
+    this.router.post(`${prefix}/request/password/reset`, AuthController.requestPasswordReset);
 
-    this.router.post(`${prefix}/reset/password`, AuthController.login);
+    this.router.post(`${prefix}/reset/password`, AuthController.resetPassword);
 
     this.router.post(`${prefix}/refresh/token`, AuthController.login);
 
