@@ -214,42 +214,57 @@ class AuthController {
     }
   }
 
-  // public static async resetPassword(req: Request, res: Response): Promise<any> {
-  //   // Check if username and password are set
-  //   const email: any = req.body.email;
+  public static async requestPasswordReset(req: Request, res: Response): Promise<any> {
+    // Check if username and password are set
+    const email: any = req.body.email;
 
-  //   if (!email) {
-  //     res.status(400).send('Bad Request');
-  //   }
-  //   let auth: Auth;
+    if (!email) {
+      res.status(400).send('Bad Request');
+    }
+    let auth: Auth;
 
-  //   try {
-  //     auth = await AuthController.authRepository().findOneOrFail({ where: { email } });
+    try {
+      auth = await AuthController.authRepository().findOneOrFail({ where: { email } });
 
-  //     const token: any = cryptoRandomString({ length: 16 });
+      if (!auth) return res.status(401).json({ msg: 'Invalid email' });
 
-  //     const hostUrl: any = WEB_APP_URL + '/new-password';
-  //     const to: any = user.email;
+      await AuthController.authRepository().update(auth.id, { activationCode: numRandom(5)});
 
-  //     const link: any = `${hostUrl}/security?token=${token}&email=${to}`;
+      /**
+       * Todo send mail here
+       */
+      return res.status(200).json({ msg: 'Reset code sent by email' });
+    } catch (error) {
+      res.status(401).send();
+    }
+  }
 
-  //     const subject: any = 'Confirmez la reinitialisation de votre mot de passe';
+  public static async resetPassword(req: Request, res: Response): Promise<any> {
+    // Check if username and password are set
+    const activationCode: any = req.body.code;
+    const password: any = req.body.password;
 
-  //     // sendVerificationEmail
-  //     const data = {
-  //       template: 'reset-password',
-  //       userFirstName: user.firstName,
-  //       link: link,
-  //       recipientEmail: user.email,
-  //       senderEmail: user.email
-  //     };
-  //     AuthController.sendEmail(data);
+    if (!activationCode || !password) res.status(400).send('Bad Request');
 
-  //     return res.status(200).send();
-  //   } catch (error) {
-  //     res.status(401).send();
-  //   }
-  // }
+    let auth: Auth | undefined;
+
+    try {
+      auth = await AuthController.authRepository().findOne({ where: { activationCode }, relations: [''] });
+
+      if (!auth) return res.status(401).json({ msg: 'Incorect code' });
+
+      const encoded = bcrypt.hashSync(password);
+
+      await AuthController.authRepository().update(auth.id, { password: encoded });
+
+      /**
+       * Todo send mail here
+       */
+      return res.status(200).json({ msg: 'Reset code sent by email' });
+    } catch (error) {
+      res.status(401).send();
+    }
+  }
 
   // public static async forgottenPassword(req: Request, res: Response): Promise<any> {
   //   // Get the ID from the url
