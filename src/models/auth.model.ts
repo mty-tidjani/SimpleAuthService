@@ -1,11 +1,12 @@
-import { Entity, Column, OneToOne } from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
 import { User } from './user.model';
 import { ModelEntity } from './app.model';
 
 @Entity({ name: 'auth' })
 export class Auth extends ModelEntity {
 
-  @OneToOne(type => User, user => user.id, { nullable: false })
+  @OneToOne(type => User)
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user: User;
 
   @Column({ name: 'password', nullable: false })

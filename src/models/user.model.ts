@@ -2,11 +2,11 @@ import { Entity, Column, OneToOne } from 'typeorm';
 import { Auth } from './auth.model';
 import { ModelEntity } from './app.model';
 
-@Entity({ name: 'clients' })
+@Entity({ name: 'users' })
 export class User extends ModelEntity {
 
-  // @OneToOne(type => Auth, auth => auth.id, { nullable: true })
-  // auth: Auth;
+  @OneToOne(type => Auth, auth => auth.user, { nullable: true })
+  auth: Auth;
 
   @Column({ name: 'username', nullable: false })
   username: string;

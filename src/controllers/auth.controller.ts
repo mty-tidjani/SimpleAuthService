@@ -3,8 +3,6 @@ import { Request, Response, NextFunction } from 'express';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 
-const cryptoRandomString = require('crypto-random-string');
-
 import { User } from '../models/user.model';
 
 import { UserRepository } from '../repositories/user.repo';
@@ -109,111 +107,72 @@ class AuthController {
     res.status(200).send({ user, token });
   }
 
-  // public static async tokenConfirmation(req: Request, res: Response): Promise<any> {
-  //   // Get the ID from the url
-  //   const email: any = req.query.email;
-  //   const token: any = req.query.token;
+  public static async tokenConfirmation(req: Request, res: Response): Promise<any> {
+    // Get the ID from the url
+    const activationToken: any = req.query.token;
 
-  //   try {
+    try {
 
-  //     const tVerif: any = await AuthController.tokenVerificationRepository().find({ where: { token, isExpired: false } });
+      const auth: Auth | undefined = await AuthController.authRepository().findOne({ where: { activationToken }, relations: ['user'] });
 
-  //     if (tVerif === []) {
-  //       return res.status(403).send('Token invalide');
-  //     }
+      if (!auth)  return res.status(403).send('Token invalide');
 
-  //     const tk: any = tVerif[0];
+      console.log(auth);
 
-  //     console.log(tk);
-  //     if (tk.isExpired) {
-  //       return res.status(403).send('Token expiré');
-  //     }
+      try {
+        const { user } = auth;
+        if (user?.verified) return res.status(202).send('Account already activated');
 
-  //     const userV: any = await AuthController.userRepository().find({ where: { id: tk.userId } });
+        try {
+          user.verified = true;
+          await AuthController.userRepository().update(user.id, { verified: true });
 
-  //     if (email !== userV[0].email) {
-  //       console.log(email);
-  //       console.log(userV[0]);
-  //       return res.status(403).send('Verification failed');
-  //     }
+          /**
+           * TODO SEND EMAIL HERE
+           */
+          // const subject: any = 'Votre compte a été activé avec succès';
 
-  //     try {
-  //       const userList: User[] = await AuthController.userRepository().find({ where: { email } });
+          // const message: any = 'Votre compte a été activé avec succès';
 
-  //       if (userList === []) {
-  //         res.status(404).send('User not found');
-  //       }
+          // const data = {
+          //   template: 'account-activated',
+          //   userFirstName: user.firstName,
+          //   link: '',
+          //   recipientEmail: user.email,
+          //   senderEmail: user.email
+          // };
 
-  //       const user: any = userList[0];
+         // AuthController.sendEmail(data);
 
-  //       if (user.isVerified) {
-  //         return res.status(202).send('Email Already Verified');
-  //       }
-  //       try {
-  //         user.isVerified = true;
-  //         await AuthController.userRepository().update(user.id, { isVerified: true });
-  //         console.log(user);
-  //         // tk.isExpired = true;
-  //         await AuthController.tokenVerificationRepository().update(tk.id, { isExpired: true });
+          return res.status(200).send(`${user.username}'s account has been verified`);
+        } catch (error) {
+          return res.status(403).send(error);
+        }
 
-  //         const subject: any = 'Votre compte a été activé avec succès';
+      } catch (error) {
+        // If not found, send a 404 response
+        return res.status(404).send('User not found');
+      }
+    } catch (error) {
+      console.log(error);
 
-  //         const message: any = 'Votre compte a été activé avec succès';
+      return res.status(403).send(error);
+    }
+  }
 
-  //         const data = {
-  //           template: 'account-activated',
-  //           userFirstName: user.firstName,
-  //           link: '',
-  //           recipientEmail: user.email,
-  //           senderEmail: user.email
-  //         };
-
-  //         AuthController.sendEmail(data);
-  //         // AuthController.sendEmail('account-activated', user.email, user.firstName, '');
-  //         // emailNature: any, recipient: any, fname: any, link: any
-
-  //         return res.status(200).send(`User with ${user.email} has been verified`);
-  //       } catch (error) {
-  //         console.log('tges');
-
-  //         // return res.status(403).send('Verification failed');
-  //         return res.status(403).send(error);
-  //       }
-
-  //     } catch (error) {
-  //       // If not found, send a 404 response
-  //       return res.status(404).send('User not found');
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-
-  //     return res.status(403).send(error);
-  //   }
-  // }
-
-  // public static async sendResetPasswordEmail(req: Request, res: Response): Promise<any> {
+  // public static async resetPassword(req: Request, res: Response): Promise<any> {
   //   // Check if username and password are set
   //   const email: any = req.body.email;
 
   //   if (!email) {
-  //     res.status(400).send();
+  //     res.status(400).send('Bad Request');
   //   }
-  //   let user: User;
+  //   let auth: Auth;
 
   //   try {
-  //     user = await AuthController.userRepository().findOneOrFail({ where: { email } });
-  //     const vToken: any = new TokenVerification();
-  //     const token: any = cryptoRandomString({ length: 16 });
+  //     auth = await AuthController.authRepository().findOneOrFail({ where: { email } });
 
-  //     console.log(token);
-  //     vToken.token = token;
-  //     vToken.user = user;
-  //     vToken.isExpired = false;
-  //     try {
-  //       await AuthController.tokenVerificationRepository().save(vToken);
-  //     } catch (e) {
-  //       return res.status(409).send('token already in use');
-  //     }
+  //     const token: any = cryptoRandomString({ length: 16 });
 
   //     const hostUrl: any = WEB_APP_URL + '/new-password';
   //     const to: any = user.email;

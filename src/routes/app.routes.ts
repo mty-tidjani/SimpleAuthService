@@ -8,9 +8,11 @@ export class AppRoutes extends BaseRouter {
   init(): Router {
     const prefix = this.config.routesPrefix;
 
+    this.router.post(`${prefix}/register`, AuthController.create);
+
     this.router.post(`${prefix}/login`, AuthController.login);
 
-    this.router.post(`${prefix}/register`, AuthController.create);
+    this.router.get(`${prefix}/activate`, AuthController.tokenConfirmation);
 
     this.router.post(`${prefix}/reset/password`, AuthController.login);
 
