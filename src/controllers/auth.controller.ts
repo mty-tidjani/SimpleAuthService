@@ -160,6 +160,60 @@ class AuthController {
     }
   }
 
+  public static async codeConfirmation(req: Request, res: Response): Promise<any> {
+    // Get the ID from the url
+    const activationCode: any = req.body.code;
+
+    try {
+
+      const auth: Auth | undefined = await AuthController.authRepository().findOne({ where: { activationCode }, relations: ['user'] });
+
+      if (!auth)  return res.status(403).send('Token invalide');
+
+      console.log(auth);
+
+      try {
+        const { user } = auth;
+        if (user?.verified) return res.status(202).json({ msg: 'Account already activated' });
+
+        try {
+          user.verified = true;
+          await AuthController.userRepository().update(user.id, { verified: true });
+
+          /**
+           * TODO SEND EMAIL HERE
+           */
+          // const subject: any = 'Votre compte a été activé avec succès';
+
+          // const message: any = 'Votre compte a été activé avec succès';
+
+          // const data = {
+          //   template: 'account-activated',
+          //   userFirstName: user.firstName,
+          //   link: '',
+          //   recipientEmail: user.email,
+          //   senderEmail: user.email
+          // };
+
+         // AuthController.sendEmail(data);
+          const token = jwt.sign(
+            { ...user }, config.jwtoken,
+            { expiresIn: config.jwtExpire },
+          );
+
+          res.status(201).json({ user, token });
+        } catch (error) {
+          return res.status(403).send(error);
+        }
+
+      } catch (error) {
+        return res.status(404).json({ msg: 'User not found' });
+      }
+    } catch (error) {
+      return res.status(403).json(error);
+    }
+  }
+
   // public static async resetPassword(req: Request, res: Response): Promise<any> {
   //   // Check if username and password are set
   //   const email: any = req.body.email;

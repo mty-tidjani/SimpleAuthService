@@ -14,11 +14,11 @@ export class AppRoutes extends BaseRouter {
 
     this.router.get(`${prefix}/activate`, AuthController.tokenConfirmation);
 
+    this.router.post(`${prefix}/confirm/account`, AuthController.codeConfirmation);
+
     this.router.post(`${prefix}/reset/password`, AuthController.login);
 
     this.router.post(`${prefix}/refresh/token`, AuthController.login);
-
-    this.router.post(`${prefix}/confirm/account`, AuthController.login);
 
     this.router.post(`${prefix}/forgot/password`, AuthController.login);
 
