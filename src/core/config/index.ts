@@ -7,7 +7,7 @@ const config: Config = {
   port: env.APP_PORT,
   routesPrefix: env.ROUTES_PREFIX,
   logDir: env.LOG_DIR,
-  jwtSecret: env.JWT_TOKEN,
+  jwtSecret: env.JWT_SECRET,
   jwtExpire: env.JWT_EXPIRE
 };
 

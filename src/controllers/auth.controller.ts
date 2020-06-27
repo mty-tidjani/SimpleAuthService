@@ -296,13 +296,10 @@ class AuthController {
         { expiresIn: config.jwtExpire },
       );
 
-      res.status(201).send({ token: tokn });
+      return res.status(201).send({ token: tokn });
     } catch (err) {
       return res.status(401).json({ err, msg: 'Not authorized' });
     }
-
-    // Get the ID from the url
-    return res.status(200).json({ msg: "Lolololololololo" });
   }
 
   // static sendEmail(data: any) {
