@@ -7,3 +7,5 @@ temp/
 logs/
 .env
 .env.prod
+.ormconfig.json
+.ormconfig.prod.json
