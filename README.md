@@ -10,7 +10,6 @@ Authentication service ready for use
  5. Express
  6. Winston
  7. ApiDoc
- 9. Multer
 
 ## Start project
 1 - Clone project
@@ -42,5 +41,5 @@ Modify/Update project to fit your Project needs and...
     $  docker-compose up
 
 
-**- Tidjani** :  Thank you! 
+**- Tidjani**
 
